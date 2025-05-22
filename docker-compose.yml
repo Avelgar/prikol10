@@ -1,0 +1,101 @@
+version: "3.8"
+
+services:
+  # Балансировщик нагрузки
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    build: ./nginx
+    depends_on:
+      - admin1
+      - admin2
+      - admin3
+      - user1
+      - user2
+      - user3
+      - graphql
+      - websocket
+
+  # Экземпляры админки на разных портах
+  admin1:
+    build: ./admin
+    environment:
+      - PORT=3000
+      - INSTANCE_NUM=1
+      - WS_URL=ws://localhost/ws
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./data:/usr/src/app/data
+
+  admin2:
+    build: ./admin
+    environment:
+      - PORT=3000
+      - INSTANCE_NUM=2
+      - WS_URL=ws://localhost/ws
+    ports:
+      - "3002:3000"
+    volumes:
+      - ./data:/usr/src/app/data
+
+  admin3:
+    build: ./admin
+    environment:
+      - PORT=3000
+      - INSTANCE_NUM=3
+      - WS_URL=ws://localhost/ws
+    ports:
+      - "3003:3000"
+    volumes:
+      - ./data:/usr/src/app/data
+
+  # Экземпляры пользовательского интерфейса на разных портах
+  user1:
+    build: ./user
+    environment:
+      - PORT=8080
+      - INSTANCE_NUM=1
+      - GRAPHQL_URL=http://nginx/graphql
+      - WS_URL=ws://localhost/ws
+    ports:
+      - "8081:8080"
+
+  user2:
+    build: ./user
+    environment:
+      - PORT=8080
+      - INSTANCE_NUM=2
+      - GRAPHQL_URL=http://nginx/graphql
+      - WS_URL=ws://localhost/ws
+    ports:
+      - "8082:8080"
+
+  user3:
+    build: ./user
+    environment:
+      - PORT=8080
+      - INSTANCE_NUM=3
+      - GRAPHQL_URL=http://nginx/graphql
+      - WS_URL=ws://localhost/ws
+    ports:
+      - "8083:8080"
+
+  # GraphQL сервер
+  graphql:
+    build: ./graphql
+    environment:
+      - PORT=4000
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./data:/usr/src/app/data
+
+  # WebSocket сервер
+  websocket:
+    build: ./websocket
+    environment:
+      - PORT=9000
+    ports:
+      - "9000:9000"

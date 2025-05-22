@@ -1,0 +1,14 @@
+{
+    "name": "user",
+    "version": "1.0.0",
+    "description": "User service",
+    "main": "userserver.js",
+    "scripts": {
+      "start": "node userserver.js"
+    },
+    "dependencies": {
+      "express": "^4.17.1",
+      "path": "^0.12.7",
+      "node-fetch": "^2.6.7"
+    }
+  }
